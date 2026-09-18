@@ -1,0 +1,65 @@
+import math
+import matplotlib.pyplot as plt
+
+
+def f(x):
+    """Вихідна функція f(x) = lg(x) + x - 0.5"""
+    return math.log10(x) + x - 0.5
+
+
+def tabular_separation():
+    print("=== 1. Табличний метод (Табулювання) ===")
+    print("ОДЗ рівняння: x > 0. Почнемо табулювання з 0.1")
+
+    a, b = 0.1, 1.0
+    step1 = 0.1
+    table = []
+
+    # Первинне табулювання
+    x = a
+    while x <= b + 1e-9:
+        table.append((x, f(x)))
+        x += step1
+
+    print(f"Первинне табулювання (крок {step1}):")
+    refined_interval = None
+    for i in range(len(table) - 1):
+        x1, y1 = table[i]
+        x2, y2 = table[i + 1]
+        print(f"x = {x1:.1f} | f(x) = {y1:.4f}")
+        if y1 * y2 <= 0:
+            refined_interval = (x1, x2)
+            print(f"x = {x2:.1f} | f(x) = {y2:.4f}")
+            print(f"-> Функція змінює знак на проміжку: [{x1:.1f}, {x2:.1f}]\n")
+
+    return refined_interval
+
+
+def graphical_separation(interval):
+    print("=== 2. Графічний метод ===")
+    # Перетворимо рівняння lg(x) + x = 0.5 у вигляд lg(x) = 0.5 - x
+    # Будуємо графіки f1(x) = lg(x) та f2(x) = 0.5 - x
+
+    x_vals = [0.05 + i * 0.05 for i in range(40)]  # Від 0.05 до 2.0
+    y1_vals = [math.log10(xi) for xi in x_vals]
+    y2_vals = [0.5 - xi for xi in x_vals]
+
+    plt.figure(figsize=(9, 5))
+    plt.plot(x_vals, y1_vals, label="$f_1(x) = \lg(x)$", color="blue", linewidth=2)
+    plt.plot(x_vals, y2_vals, label="$f_2(x) = 0.5 - x$", color="red", linewidth=2)
+
+    if interval:
+        plt.axvspan(interval[0], interval[1], color='green', alpha=0.2, label="Інтервал ізоляції")
+
+    plt.axhline(0, color='black', linewidth=0.8)
+    plt.axvline(0, color='black', linewidth=0.8)
+    plt.title("Графічний метод: перетин $\lg(x)$ та $0.5 - x$")
+    plt.ylim(-2, 2)
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.show()
+
+
+if __name__ == "__main__":
+    interval = tabular_separation()
+    graphical_separation(interval)
