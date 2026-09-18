@@ -1,0 +1,82 @@
+import matplotlib.pyplot as plt
+
+
+def f(x):
+    """Вихідна функція f(x) = x^5 - 3x^2 + 1"""
+    return x ** 5 - 3 * x ** 2 + 1
+
+
+def analytical_separation():
+    print(" 1. Аналітичне дослідження ")
+    coeffs = [1, 0, 0, -3, 0, 1]
+    an, a0 = coeffs[0], coeffs[-1]
+
+    A = max(abs(c) for c in coeffs[1:])
+    B = max(abs(c) for c in coeffs[:-1])
+
+    lower_bound = abs(a0) / (abs(a0) + B)
+    upper_bound = 1 + A / abs(an)
+
+    print(f"1.1. Кільце коренів: {lower_bound:.3f} <= |x| <= {upper_bound:.3f}")
+    print(
+        f"Корені лежать у проміжках: [{-upper_bound:.3f}, {-lower_bound:.3f}] U [{lower_bound:.3f}, {upper_bound:.3f}]")
+    print("\n1.2. Теорема Декарта:")
+    print("Змін знаків P(x): 2. Можлива кількість додатних коренів: 2 або 0.")
+    print("Змін знаків P(-x): 1. Кількість від'ємних коренів: 1.")
+
+    return -upper_bound, upper_bound
+
+
+def tabular_separation(start, end):
+    print("\n 2. Табличний метод (Табулювання)")
+    step1 = 0.5
+    table = []
+    x = start
+    while x <= end + 1e-9:
+        table.append((x, f(x)))
+        x += step1
+
+    print(f"Первинне табулювання (крок {step1}):")
+    for i in range(len(table) - 1):
+        x1, y1 = table[i]
+        x2, y2 = table[i + 1]
+        if y1 * y2 <= 0:
+            print(f"Зміна знаку на проміжку: [{x1:.3f}, {x2:.3f}]")
+
+    a_primary, b_primary = 1.0, 1.5
+    print(f"\nВторинне табулювання (звуження, крок 0.1) для обраного кореня [{a_primary}, {b_primary}]:")
+    step2 = 0.1
+    x = a_primary
+    refined_interval = None
+    while x <= b_primary + 1e-9:
+        if f(x) * f(x + step2) <= 0:
+            refined_interval = (x, x + step2)
+            print(f"Звужений інтервал ізоляції: [{refined_interval[0]:.3f}, {refined_interval[1]:.3f}]")
+            break
+        x += step2
+
+    return refined_interval
+
+
+def graphical_separation():
+    x_vals = [-1.5 + i * 0.05 for i in range(70)]
+    y1_vals = [xi ** 5 for xi in x_vals]
+    y2_vals = [3 * xi ** 2 - 1 for xi in x_vals]
+
+    plt.figure(figsize=(9, 5))
+    plt.plot(x_vals, y1_vals, label="$f_1(x) = x^5$", color="blue")
+    plt.plot(x_vals, y2_vals, label="$f_2(x) = 3x^2 - 1$", color="red")
+
+    plt.axhline(0, color='black', linewidth=0.8)
+    plt.axvline(0, color='black', linewidth=0.8)
+    plt.title("Графічний метод: перетин $f_1(x)$ та $f_2(x)$")
+    plt.ylim(-5, 10)
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.show()
+
+
+if __name__ == "__main__":
+    start_val, end_val = analytical_separation()
+    tabular_separation(start_val, end_val)
+    graphical_separation()
