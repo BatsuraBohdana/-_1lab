@@ -1,0 +1,61 @@
+import math
+
+
+def f(x):
+    return math.log10(x) + x - 0.5
+
+
+def phi(x):
+    """Ітераційна функція phi(x) = 0.5 - lg(x)"""
+    return 0.5 - math.log10(x)
+
+
+def phi_prime(x):
+    """Похідна ітераційної функції для перевірки збіжності"""
+    return -1.0 / (x * math.log(10))
+
+
+def simple_iteration(a, b, eps):
+    print("=== Метод простої ітерації (МПІ) ===")
+
+    # Перевірка умови збіжності
+    max_derivative = max(abs(phi_prime(a)), abs(phi_prime(b)))
+    print(f"Перевірка збіжності: max |phi'(x)| на [{a}, {b}] = {max_derivative:.4f}")
+    if max_derivative >= 1:
+        print("Увага! Умова збіжності |phi'(x)| < 1 не виконується. Метод може не зійтися.")
+    else:
+        print("Умова збіжності виконується (q < 1).\n")
+
+    # Формуємо таблицю
+    q = max_derivative
+    x_prev = (a + b) / 2.0  # Початкове наближення (середина відрізка)
+
+    print(f"{'n':>3} | {'x_n':>12} | {'|x_n - x_(n-1)|':>16}")
+    print("-" * 37)
+    print(f"{0:>3} | {x_prev:12.6f} | {'---':>16}")
+
+    n = 0
+    while True:
+        x_new = phi(x_prev)
+        n += 1
+        diff = abs(x_new - x_prev)
+
+        print(f"{n:>3} | {x_new:12.6f} | {diff:16.6f}")
+
+        # Критерій зупинки (якщо q < 0.5 можна просто diff < eps, але краще загальний)
+        if diff <= (1 - q) / q * eps or diff < eps:
+            break
+
+        x_prev = x_new
+
+    print("-" * 37)
+    print(f"Отримане наближене значення: x* = {x_new:.5f}")
+    print(f"Кількість ітерацій: {n}")
+    print(f"Перевірка f(x*) = {f(x_new):.6f}")
+    return x_new
+
+
+if __name__ == "__main__":
+    A, B = 0.6, 0.7
+    EPSILON = 0.001
+    simple_iteration(A, B, EPSILON)
