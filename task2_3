@@ -1,0 +1,68 @@
+import math
+
+
+def f(x):
+    """f(x) = lg(x) + x - 0.5"""
+    return math.log10(x) + x - 0.5
+
+
+def fp(x):
+    """Перша похідна f'(x) = 1/(x*ln(10)) + 1"""
+    return 1.0 / (x * math.log(10)) + 1.0
+
+
+def fpp(x):
+    """Друга похідна f''(x) = -1/(x^2 * ln(10))"""
+    return -1.0 / (x ** 2 * math.log(10))
+
+
+def newton_method(a, b, eps):
+    print("=== Метод Ньютона (дотичних) ===")
+    print(f"Відрізок ізоляції: [{a:.3f}, {b:.3f}], eps = {eps}")
+
+    # Перевірка умови знаходження початкового наближення: f(x0) * f''(x0) > 0
+    left_check = f(a) * fpp(a)
+    right_check = f(b) * fpp(b)
+    print(f"f(a)*f''(a) = {left_check:.5f}, f(b)*f''(b) = {right_check:.5f}")
+
+    if left_check > 0:
+        x0 = a
+    elif right_check > 0:
+        x0 = b
+    else:
+        # Якщо обидві не виконуються, беремо середину
+        x0 = (a + b) / 2.0
+
+    print(f"Початкове наближення x0 = {x0}\n")
+
+    header = f"{'n':>2} | {'x_n':>10} | {'f(x_n)':>10} | {'f''(x_n)':>10} | {'|x_n - x_(n-1)|':>15} | Висновок"
+    print(header)
+    print("-" * len(header))
+    print(f"{0:>2} | {x0:10.6f} | {f(x0):10.6f} | {fp(x0):10.6f} | {'---':>15} |")
+
+    x_prev = x0
+    n = 0
+    while True:
+        fx = f(x_prev)
+        fpx = fp(x_prev)
+
+        x_new = x_prev - fx / fpx
+        n += 1
+        diff = abs(x_new - x_prev)
+
+        verdict = "> eps" if diff >= eps and abs(f(x_new)) >= eps else "< eps"
+        print(f"{n:>2} | {x_new:10.6f} | {f(x_new):10.6f} | {fp(x_new):10.6f} | {diff:15.6f} | {verdict}")
+
+        if diff < eps or abs(f(x_new)) < eps:
+            break
+        x_prev = x_new
+
+    print(f"\nОтримане наближене значення: x* = {x_new:.5f}")
+    print(f"Кількість ітерацій: {n}")
+    return x_new
+
+
+if __name__ == "__main__":
+    A, B = 0.6, 0.7
+    EPSILON = 0.001
+    newton_method(A, B, EPSILON)
