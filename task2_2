@@ -1,0 +1,73 @@
+def f(x):
+    """Вихідна функція f(x) = x^5 - 3x^2 + 1"""
+    return x ** 5 - 3 * x ** 2 + 1
+
+
+def fp(x):
+    """Перша похідна f'(x) = 5x^4 - 6x"""
+    return 5 * x ** 4 - 6 * x
+
+
+def fpp(x):
+    """Друга похідна f''(x) = 20x^3 - 6"""
+    return 20 * x ** 3 - 6
+
+
+def chord_method(a, b, eps):
+    print(" Метод хорд")
+    print(f"Відрізок ізоляції: [{a:.3f}, {b:.3f}], eps = {eps}")
+
+    left_check = f(a) * fpp(a)
+    right_check = f(b) * fpp(b)
+    print(f"f(a)*f''(a) = {left_check:.5f}, f(b)*f''(b) = {right_check:.5f}")
+
+    if right_check > 0 and left_check <= 0:
+        fixed_end = "b"
+        x_prev = a
+    elif left_check > 0 and right_check <= 0:
+        fixed_end = "a"
+        x_prev = b
+    else:
+        mid = (a + b) / 2
+        if fp(mid) * fpp(mid) > 0:
+            fixed_end = "b"
+            x_prev = a
+        else:
+            fixed_end = "a"
+            x_prev = b
+
+    print(f"Нерухомий кінець: {fixed_end}. Початкове наближення x0 = {x_prev}")
+
+    header = f"{'n':>2} | {'x_n':>12} | {'f(x_n)':>12} | {'|x_n - x_(n-1)|':>16} | Висновок"
+    print(header)
+    print("-" * len(header))
+    print(f"{0:>2} | {x_prev:12.6f} | {f(x_prev):12.6f} | {'---':>16} |")
+
+    n = 0
+    while True:
+        fx = f(x_prev)
+        if fixed_end == "b":
+            x_new = x_prev - fx * (b - x_prev) / (f(b) - fx)
+        else:
+            x_new = x_prev - fx * (a - x_prev) / (f(a) - fx)
+
+        n += 1
+        diff = abs(x_new - x_prev)
+        verdict = "> eps" if diff >= eps else "< eps"
+
+        print(f"{n:>2} | {x_new:12.6f} | {f(x_new):12.6f} | {diff:16.6f} | {verdict}")
+
+        if diff < eps or abs(f(x_new)) < eps:
+            break
+        x_prev = x_new
+
+    print(f"\nОтримане наближене значення: x* = {x_new:.5f}")
+    print(f"Кількість ітерацій: {n}")
+    return x_new
+
+
+if __name__ == "__main__":
+    A, B = 1.0, 1.5
+    EPSILON = 0.001
+
+    chord_method(A, B, EPSILON)
