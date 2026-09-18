@@ -1,0 +1,44 @@
+def f(x):
+    """Вихідна функція f(x) = x^5 - 3x^2 + 1"""
+    return x ** 5 - 3 * x ** 2 + 1
+
+
+def bisection_method(a, b, eps):
+    print("Метод дихотомії (половинного ділення) ")
+    print(f"Відрізок ізоляції: [{a:.3f}, {b:.3f}], eps = {eps}")
+
+    header = f"{'n':>2} | {'a_n':>10} | {'b_n':>10} | {'x_n':>10} | {'f(a_n)':>10} | {'f(b_n)':>10} | {'f(x_n)':>10} | {'b_n-a_n':>10} | Висновок"
+    print(header)
+    print("-" * len(header))
+
+    an, bn = a, b
+    n = 0
+    while True:
+        xn = (an + bn) / 2.0
+        fa, fb, fx = f(an), f(bn), f(xn)
+        gap = bn - an
+        verdict = "> 2*eps" if gap >= 2 * eps else "< 2*eps"
+
+        print(
+            f"{n:>2} | {an:10.6f} | {bn:10.6f} | {xn:10.6f} | {fa:10.5f} | {fb:10.5f} | {fx:10.5f} | {gap:10.6f} | {verdict}")
+
+        if gap < 2 * eps:
+            root = xn
+            break
+
+        if fa * fx < 0:
+            bn = xn
+        else:
+            an = xn
+        n += 1
+
+    print(f"\nОтримане наближене значення: x* = {root:.5f}")
+    print(f"Кількість ітерацій: {n}\n")
+    return root
+
+
+if __name__ == "__main__":
+    A, B = 1.0, 1.5
+    EPSILON = 0.001
+
+    bisection_method(A, B, EPSILON)
